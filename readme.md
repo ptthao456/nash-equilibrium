@@ -94,5 +94,3 @@ python main.py
 - Nếu gặp lỗi khi cài `nashpy`, hãy kiểm tra phiên bản Python (>=3.8) và cài lại `scipy`.
 
 ---
-
-Nếu bạn muốn, tôi có thể chạy `main.py` trong môi trường hiện tại (nếu cho phép). 
