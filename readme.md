@@ -1,96 +1,114 @@
-# 📌 Tìm Cân Bằng Nash bằng Python (NashPy)
+# 🎯 STAG HUNT -- Nash Equilibrium using NashPy
 
----
+## 1️⃣ Mô hình trò chơi (Normal Form)
 
-## 🧠 Giới thiệu
+Trò chơi **Stag Hunt** là trò chơi đối xứng hai người chơi với thông tin
+đầy đủ.
 
-Repository này minh họa cách sử dụng thư viện **NashPy** trong Python
-để tìm **cân bằng Nash** cho một bài toán cạnh tranh giá cả
-giữa hai doanh nghiệp trong lý thuyết trò chơi.
+### Tập chiến lược
 
----
+Mỗi người chơi có hai chiến lược:
 
-## 🎯 Mục tiêu
+-   **Stag** (Săn hươu)\
+-   **Hare** (Săn thỏ)
 
-- Mô hình hóa trò chơi hai người dạng ma trận.
-- Dùng `NashPy` để tìm các cân bằng Nash (hỗn hợp/tùy chọn).
-- So sánh kết quả lập trình với phân tích lý thuyết.
+S₁ = S₂ = {Stag, Hare}
 
-## 🎮 Mô tả trò chơi
+------------------------------------------------------------------------
 
-### Người chơi
-- Doanh nghiệp A
-- Doanh nghiệp B
+## 2️⃣ Biểu diễn ma trận lợi ích (Bimatrix)
 
-### Chiến lược
-- `H`: Giữ giá cao
-- `L`: Giảm giá
+Ma trận payoff chung:
 
-### Ma trận payoff
+                       Player 2: Stag   Player 2: Hare
+  -------------------- ---------------- ----------------
+  **Player 1: Stag**   (3,3)            (0,2)
+  **Player 1: Hare**   (2,0)            (1,1)
 
-| A \\ B| H       | L       |
-|-------|---------|---------|
-| H     | (6, 6)  | (1, 8)  |
-| L     | (8, 1)  | (3, 3)  |
+Trong mỗi ô: - Số thứ nhất: payoff của Player 1\
+- Số thứ hai: payoff của Player 2
 
----
+------------------------------------------------------------------------
 
-## ⚙️ Hướng dẫn chạy (từng bước)
+## 3️⃣ Cách triển khai trong Python
 
-1. Clone repository và chuyển vào thư mục:
+Thư viện **NashPy** yêu cầu truyền vào hai ma trận payoff riêng biệt:
 
-```bash
-git clone https://github.com/ptthao456/nash-equilibrium.git
-cd nash-equilibrium
+Game(A, B)
+
+Trong đó: - A: ma trận lợi ích của Player 1\
+- B: ma trận lợi ích của Player 2
+
+Chương trình thực hiện:
+
+1.  Khai báo ma trận payoff chung (a,b)
+2.  Tách thành hai ma trận số
+3.  Khởi tạo đối tượng trò chơi
+4.  Tìm cân bằng Nash bằng support_enumeration()
+
+------------------------------------------------------------------------
+
+## 4️⃣ Code
+
+``` python
+import numpy as np
+import nashpy as nash
+
+
+def analyze_stag_hunt_single_matrix():
+    strategies = ["Stag", "Hare"]
+
+    payoff_matrix = [
+        [(3, 3), (0, 2)],
+        [(2, 0), (1, 1)]
+    ]
+
+    payoff_player1 = np.array([[cell[0] for cell in row] for row in payoff_matrix])
+    payoff_player2 = np.array([[cell[1] for cell in row] for row in payoff_matrix])
+
+    stag_hunt_game = nash.Game(payoff_player1, payoff_player2)
+
+    print("=== PAYOFF MATRIX (a,b) ===")
+    for row in payoff_matrix:
+        print(row)
+
+    print("\n=== NASH EQUILIBRIA ===")
+
+    equilibria = list(stag_hunt_game.support_enumeration())
+
+    for sigma_p1, sigma_p2 in equilibria:
+        print("Player 1:", sigma_p1)
+        print("Player 2:", sigma_p2)
+        print("-" * 30)
+
+
+if __name__ == "__main__":
+    analyze_stag_hunt_single_matrix()
 ```
 
-2. Tạo virtual environment:
+------------------------------------------------------------------------
 
-```bash
-python -m venv venv
+## 5️⃣ Kết quả cân bằng Nash
+
+Chương trình tìm được:
+
+✔ Hai cân bằng Nash thuần túy: - (Stag, Stag) - (Hare, Hare)
+
+✔ Một cân bằng Nash hỗn hợp
+
+------------------------------------------------------------------------
+
+## 6️⃣ Cài đặt thư viện
+
+``` bash
+pip install numpy nashpy
 ```
 
-3. Kích hoạt virtual environment:
+------------------------------------------------------------------------
 
-Windows (PowerShell):
+## 📌 Tóm tắt
 
-```powershell
-venv\Scripts\Activate.ps1
-# hoặc nếu dùng cmd:
-venv\Scripts\activate
-```
-
-macOS / Linux:
-
-```bash
-source venv/bin/activate
-```
-
-Khi thành công, terminal sẽ hiển thị `(venv)`.
-
-4. Cài đặt phụ thuộc:
-
-```bash
-pip install -r requirements.txt
-```
-
-File `requirements.txt` (gợi ý):
-
-- numpy
-- nashpy
-- scipy
-
-5. Chạy chương trình demo:
-
-```bash
-python main.py
-```
-
----
-
-## Ghi chú
-
-- `main.py` chứa ví dụ mô tả ma trận payoff ở trên và in ra các cân bằng Nash tìm được.
-- Nếu gặp lỗi khi cài `nashpy`, hãy kiểm tra phiên bản Python (>=3.8) và cài lại `scipy`.
-
----
+-   Biểu diễn đúng mô hình trò chơi tĩnh
+-   Tách payoff theo định nghĩa hàm lợi ích uᵢ(sᵢ, s₋ᵢ)
+-   Áp dụng thuật toán support enumeration
+-   Đối chiếu kết quả với lý thuyết trò chơi
